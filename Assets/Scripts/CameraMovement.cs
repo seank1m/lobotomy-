@@ -8,10 +8,8 @@ public class CameraMovement : MonoBehaviour
     [SerializeField]
     private Camera cam;
 
-
-    [SerializeField]
-    private SpriteRenderer mapRenderer;
     
+    private Bounds cameraBounds;
     private float mapMinX, mapMaxX, mapMinY, mapMaxY;
     private Vector3 dragOrigin;
     // Start is called before the first frame update
@@ -19,11 +17,11 @@ public class CameraMovement : MonoBehaviour
     
 
     private void Awake(){
-        mapMinX = mapRenderer.transform.position.x - mapRenderer.bounds.size.x/2f;
-        mapMaxX = mapRenderer.transform.position.x + mapRenderer.bounds.size.x/2f;
+        mapMinX = Globals.Map.transform.position.x - Globals.Map.bounds.size.x/2f;
+        mapMaxX = Globals.Map.transform.position.x + Globals.Map.bounds.size.x/2f;
 
-        mapMinY = mapRenderer.transform.position.y - mapRenderer.bounds.size.y/2f;
-        mapMaxY = mapRenderer.transform.position.y + mapRenderer.bounds.size.y/2f;
+        mapMinY = Globals.Map.transform.position.y - Globals.Map.bounds.size.y/2f;
+        mapMaxY = Globals.Map.transform.position.y + Globals.Map.bounds.size.y/2f;
     }
 
 
