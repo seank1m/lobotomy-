@@ -8,24 +8,38 @@ public class CameraMovement : MonoBehaviour
     [SerializeField]
     private Camera cam;
 
+
+    [SerializeField]
+    private SpriteRenderer mapRenderer;
+    
+    private float mapMinX, mapMaxX, mapMinY, mapMaxY;
     private Vector3 dragOrigin;
     // Start is called before the first frame update
     
-    private Bounds _cameraBounds;
-    private Vector3 _targetPosition;
+    
 
-    private void Start(){
-        var height = cam.orthographicSize;
-        var width = height * cam.aspect;
+    private void Awake(){
+        mapMinX = mapRenderer.transform.position.x - mapRenderer.bounds.size.x/2f;
+        mapMaxX = mapRenderer.transform.position.x + mapRenderer.bounds.size.x/2f;
 
-        var minX = Globals.WorldBounds.min.x + width;
-        var maxX = Globals.WorldBounds.extents.x - width;
+        mapMinY = mapRenderer.transform.position.y - mapRenderer.bounds.size.y/2f;
+        mapMaxY = mapRenderer.transform.position.y + mapRenderer.bounds.size.y/2f;
+    }
 
-        var minY = Globals.WorldBounds.min.y + height;
-        var maxY = Globals.WorldBounds.extents.y - height;
 
-        _cameraBounds = new Bounds();
-        _cameraBounds.SetMinMax(new Vector3(minX,minY,0.0f), new Vector3(maxX,maxY,0.0f));
+    private Vector3 ClampCamera(Vector3 targetPosition){
+        float camHeight = cam.orthographicSize;
+        float camWidth = cam.orthographicSize * cam.aspect;
+
+        float minX = mapMinX + camWidth;
+        float maxX = mapMaxX - camWidth;
+        float minY = mapMinY + camHeight;
+        float maxY = mapMaxY - camHeight;
+
+        float newX = Mathf.Clamp(targetPosition.x,minX,maxX);
+        float newY = Mathf.Clamp(targetPosition.y,minY,maxY);
+
+        return new Vector3(newX,newY,targetPosition.z);
     }
     // Update is called once per frame
     private void Update()
@@ -33,9 +47,7 @@ public class CameraMovement : MonoBehaviour
         PanCamera();
     }
 
-    private Vector3 getCameraBounds(){
-        return new Vector3(Mathf.Clamp(_targetPosition.x, _cameraBounds.min.x,_cameraBounds.max.x), Mathf.Clamp(_targetPosition.y,_cameraBounds.min.y, _cameraBounds.max.y),0.0f);
-    }
+   
     private void PanCamera(){
         if(Input.GetMouseButtonDown(0)){
            dragOrigin = cam.ScreenToWorldPoint(Input.mousePosition);
@@ -44,9 +56,8 @@ public class CameraMovement : MonoBehaviour
         if(Input.GetMouseButton(0)){
             Vector3 difference = dragOrigin - cam.ScreenToWorldPoint(Input.mousePosition); 
 
-            _targetPosition = difference;
-            _targetPosition = getCameraBounds();
-            cam.transform.position += _targetPosition;
+        
+            cam.transform.position = ClampCamera(cam.transform.position + difference);
     }
         }
 
